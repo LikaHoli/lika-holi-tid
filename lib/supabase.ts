@@ -1,0 +1,6 @@
+import {createClient} from '@supabase/supabase-js';
+const url=import.meta.env.VITE_SUPABASE_URL;
+const key=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+export const supabase=url&&key?createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+export async function readRecords(){if(!supabase)throw Error('Databasen är inte konfigurerad.');const {data,error}=await supabase.from('records').select('id,kind,data');if(error)throw Error('Kunde inte hämta uppgifter. Försök igen.');return data.map(x=>({...x.data,id:x.id,kind:x.kind}));}
+export async function writeRecords(items:any[],action:string){if(!supabase)throw Error('Databasen är inte konfigurerad.');const {data:{user},error:authError}=await supabase.auth.getUser();if(authError||!user)throw Error('Din inloggning har gått ut. Logga in igen.');if(!items.length)return;const query=action==='delete'?supabase.from('records').delete().eq('owner',user.id).in('id',items.map(x=>x.id)):supabase.from('records').upsert(items.map(x=>({id:x.id,owner:user.id,kind:x.kind,data:x})),{onConflict:'owner,id'});const {error}=await query;if(error)throw Error('Kunde inte spara. Kontrollera anslutningen och försök igen.');}

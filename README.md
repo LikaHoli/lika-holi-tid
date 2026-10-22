@@ -1,39 +1,34 @@
 # Lika Holi · Tid & underlag
 
-Tidrapportering med synkronisering mellan mobil och dator, veckosummering och manuell fakturahistorik.
+En enkel fristående webbsida utan konto, databas eller abonnemang. Registrera kunder, timmar, mil, timpris och milersättning. Filtrera och kopiera fakturaunderlag till Bokio eller exportera CSV. Markera rapporter som fakturerade.
 
-App: https://likaholi.github.io/lika-holi-tid/
+## Var sparas uppgifterna?
 
-## Logga in
+I den aktuella webbläsaren på den aktuella enheten (localStorage). Ingen automatisk synkronisering och ingen överföring av kundposter till GitHub. Alla som använder samma webbläsarprofil på din enhet kan öppna uppgifterna. Rensning av webbplatsdata kan radera journalen. Ladda ner JSON-säkerhetskopior regelbundet. Använd importen för att flytta till en annan enhet.
 
-Skapa ett konto med mejladress och lösenord, bekräfta mejlet och använd samma konto på alla enheter. Konton är åtskilda genom Supabase Auth och Row Level Security. Ingen OpenAI-tjänst krävs för att använda appen.
+## Publicera på GitHub Pages
 
-## Flytta gamla uppgifter
+Färdigbyggda filer finns i `docs/`. För ett GitHub Free-konto behöver repositoryt vara offentligt för GitHub Pages. Det gör källkoden och dess historik offentlig, men webbläsarens lokala kunduppgifter ingår inte.
 
-Gamla lokala poster i `lika-holi-tid-local-v1` behålls orörda. Efter inloggning erbjuder appen en överföringsknapp på varje enhet som har gamla uppgifter. Identiska poster hoppas över. Olika poster med samma id kopieras med nya id:n och kundkopplingarna följer med. Ta gärna en JSON-säkerhetskopia före överföring. Poster som registrerats separat på två enheter kan behöva kontrolleras för dubbletter.
+1. Om du accepterar offentlig källkod: Settings → General → Danger Zone → Change repository visibility → Public.
+2. Settings → Pages → Build and deployment → Deploy from a branch.
+3. Välj `main` och `/docs`, tryck Save.
+4. Vänta på att GitHub visar den publicerade länken. Ingen länk är publicerad enbart genom att koden sparats.
 
-## Synkronisering
+Supabase och Vercel behövs inte för den här versionen.
 
-Rapporter sparas direkt till databasen. Internet krävs för att spara. Appen hämtar senaste uppgifter när du återvänder till den, varje minut när den är synlig och när du trycker Synkronisera. Fel ger tydlig återkoppling; appen påstår inte att en misslyckad skrivning har sparats lokalt. Databasfunktionen sparar flera dagar atomiskt och kontrollerar versionsnummer för att förhindra tyst överskrivning. Vid konflikt: synkronisera, granska och öppna rapporten på nytt innan du sparar igen.
+## Utveckling
 
-## Projekt och kostnad
+Node 22.13+, `npm ci`, `npm run dev`, `npm run build`. Vid ändringar: ersätt `docs/` med innehållet i `dist/` och behåll `docs/.nojekyll` innan du sparar till GitHub.
 
-GitHub Pages och Supabase-organisationen använder gratisplaner. Supabase-projektet `sgvdqukglzhrujntrarx` ligger i Stockholm (`eu-north-1`). Organisationen har verifierats som `free` och projektkostnaden som 0 per månad vid skapandet. Ingen betalplan är aktiverad. Gratisplanernas kvoter gäller; Supabase kan pausa inaktiva projekt. Uppgradera inte för detta projekt utan ägarens uttryckliga godkännande.
+## Bokio
 
-## Auth-konfiguration före drift
+Underlaget kopieras manuellt. Ingen automatisk fakturaskapning. Välj rätt moms i Bokio för uppdraget.
 
-I Supabase → Authentication → URL Configuration: ange `https://likaholi.github.io/lika-holi-tid/` som Site URL och tillåten Redirect URL. Mejl/lösenord och mejlbekräftelse ska vara aktiverade. Kontrollera leverans av bekräftelse- och återställningsmejl; Supabase inbyggda mejltjänst har begränsningar och är inte en garanterad SMTP-tjänst. Appen kan inte betraktas som färdigtestad för inloggning innan detta har verifierats.
+## Registrera flera dagar
 
-Endast en publishable browser key finns i koden. Den ger ingen behörighet till användarposter utan giltig inloggning och RLS. Lägg aldrig service_role, hemlig API-nyckel eller databaslösenord i koden.
+Välj Flera dagar, ange från- och tilldatum, välj om helger ska ingå och avmarkera eventuella lediga dagar. Timmar och mil gäller per vald dag. Totalen och eventuell varning för befintliga rapporter visas före bekräftelsen. Varje dag får en separat rapport som går att ändra efteråt.
 
-## Databas
+## Veckor och fakturerade perioder
 
-Schema och åtkomstregler: `supabase/migrations/20261022_create_private_time_records.sql`. Migrationen är applicerad på projektet. Databasens användarisolering, versionskonflikter och atomisk rollback har testats i en transaktion som rullades tillbaka; inga testkonton eller testposter har lämnats kvar. Supabase säkerhetsrådgivare rapporterade inga databasvarningar vid kontrollen.
-
-## Utveckling och publicering
-
-Node 22.13+ och npm. `npm ci`, `npm test`, `npm run build`. Färdigbyggda filer i `docs/` publiceras av GitHub Pages från `main` och `/docs`. Vid ändringar: ersätt innehållet i `docs/` med `dist/` och behåll `.nojekyll`. Publicering kan köas av GitHub; verifiera den publika versionen innan en ändring anges som tillgänglig.
-
-## Fakturering
-
-Välj kund och period, kopiera underlaget till en faktura som du själv skapar i Bokio och markera sedan perioden manuellt som fakturerad. Fakturanummer, fakturadatum och period sparas. Detta är ingen direktintegration med Bokio och fakturerad betyder inte betald. Veckor följer ISO-veckor, måndag–söndag.
+Tidrapporter och kopierat fakturaunderlag delas upp efter ISO-vecka (måndag–söndag), med summering av timmar, mil och belopp. Under Fakturaunderlag kan du markera urvalets period manuellt som fakturerad med fakturadatum och valfritt nummer. Fakturerade perioder visas i en separat lista per kund, och märkningen kan ångras. Detta skapar ingen faktura eller betalningsstatus i Bokio. Period, datum och nummer följer med i CSV och JSON-säkerhetskopian.

@@ -1,6 +1,0 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {planLocalMigration} from './lib/migration.mjs';
-const c={id:'c',kind:'client',name:'Kund',rate:510,mileRate:70};const e={id:'e',kind:'entry',client:'c',project:'P',date:'2026-10-22',description:'Arbete',hours:8,rate:510,miles:4,mileRate:70,invoiced:true,invoice:'1042',invoicePeriodFrom:'2026-10-19',invoicePeriodTo:'2026-10-25'};
-test('local migration preserves invoices and does not overwrite remote records',()=>{const p=planLocalMigration([c,e],[]);assert.equal(p.items.length,2);assert.equal(p.items[1].invoice,'1042');assert.equal(p.items[1].invoicePeriodTo,'2026-10-25');});
-test('repeat migration skips identical records even with different key order',()=>{const p=planLocalMigration([c,e],[{...Object.fromEntries(Object.entries(c).reverse())},e]);assert.equal(p.items.length,0);assert.equal(p.skipped,2);});
-test('conflicting clients are cloned and their reports remapped',()=>{let n=0;const p=planLocalMigration([c,e],[{...c,name:'Annan kund'},e],()=>`copy-${++n}`);assert.equal(p.conflicts,2);assert.equal(p.items[0].id,'copy-1');assert.equal(p.items[1].client,'copy-1');assert.equal(p.items[1].id,'copy-2');});
-test('orphaned local data is rejected before writing',()=>assert.throws(()=>planLocalMigration([e],[])));

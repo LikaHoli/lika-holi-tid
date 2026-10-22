@@ -28,3 +28,7 @@ Underlaget kopieras manuellt. Ingen automatisk fakturaskapning. Välj rätt moms
 ## Registrera flera dagar
 
 Välj Flera dagar, ange från- och tilldatum, välj om helger ska ingå och avmarkera eventuella lediga dagar. Timmar och mil gäller per vald dag. Totalen och eventuell varning för befintliga rapporter visas före bekräftelsen. Varje dag får en separat rapport som går att ändra efteråt.
+
+## Veckor och fakturerade perioder
+
+Tidrapporter och kopierat fakturaunderlag delas upp efter ISO-vecka (måndag–söndag), med summering av timmar, mil och belopp. Under Fakturaunderlag kan du markera urvalets period manuellt som fakturerad med fakturadatum och valfritt nummer. Fakturerade perioder visas i en separat lista per kund, och märkningen kan ångras. Detta skapar ingen faktura eller betalningsstatus i Bokio. Period, datum och nummer följer med i CSV och JSON-säkerhetskopian.

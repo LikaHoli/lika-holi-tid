@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {weekInfo,groupByWeek} from './lib/weeks.mjs';
+const row=(date,hours=8,rate=510,miles=4)=>({id:date,date,hours,rate,miles,mileRate:70});
+test('Swedish ISO weeks use Monday to Sunday',()=>{assert.deepEqual(weekInfo('2026-10-22'),{key:'2026-W43',year:2026,week:43,start:'2026-10-19',end:'2026-10-25'});assert.equal(weekInfo('2026-10-25').week,43);assert.equal(weekInfo('2026-10-26').week,44);});
+test('week year is correct on both sides of New Year',()=>{assert.equal(weekInfo('2021-01-01').key,'2020-W53');assert.equal(weekInfo('2024-12-30').key,'2025-W01');assert.equal(weekInfo('2027-01-01').key,'2026-W53');});
+test('separate weeks and sum without losing differing historical prices',()=>{const g=groupByWeek([row('2026-10-19'),row('2026-10-20',6,550,2),row('2026-10-26')]);assert.equal(g.length,2);assert.equal(g[0].week,44);assert.equal(g[1].hours,14);assert.equal(g[1].miles,6);assert.equal(g[1].total,7800);assert.equal(g[1].entries[0].date,'2026-10-19');});
+test('filter subsets and empty selections have correct totals',()=>{const rows=[row('2026-10-19'),row('2026-10-20')];assert.equal(groupByWeek(rows.filter(x=>x.date>='2026-10-20'))[0].total,4360);assert.deepEqual(groupByWeek([]),[]);assert.throws(()=>weekInfo('2026-02-30'));});

@@ -1,0 +1,3 @@
+const KEY='lika-holi-tid-local-v1';
+export async function readRecords(){const raw=localStorage.getItem(KEY);if(!raw)return [];const records=JSON.parse(raw);if(!Array.isArray(records))throw Error('Lagrade uppgifter kunde inte läsas. Återställ en säkerhetskopia.');return records;}
+export async function writeRecords(items:any[],action:string){const records=await readRecords();const ids=new Set(items.map(x=>x.id));const next=records.filter((x:any)=>!ids.has(x.id));if(action!=='delete')next.push(...items);try{localStorage.setItem(KEY,JSON.stringify(next));}catch{throw Error('Kunde inte spara i webbläsaren. Kontrollera lagringsutrymmet och ta en säkerhetskopia.');}}
